@@ -1,0 +1,32 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# dotenv files
+.env
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Build and cache folders
+dist/
+.cache/
+.temp/
+
+# Uploaded files (if any, like uploads/images or videos)
+uploads/
+public/uploads/
+
+# VSCode settings
+.vscode/
+
+# Optional: Test coverage reports
+coverage/
+
+# Optional: Local MongoDB data (if you store db locally)
+data/
