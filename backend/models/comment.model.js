@@ -19,7 +19,7 @@ const commentSchema = new mongoose.Schema(
     },
    parentComment: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment", // যার reply, তার comment id
+      ref: "Comment",
       default: null,
     },
     likes: [

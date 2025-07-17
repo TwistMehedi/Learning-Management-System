@@ -9,7 +9,6 @@ export const registerUser = TryCatch(async (req, res, next) => {
 
   if (!name || !email || !password) next(new ErrorHandler("Please provide all required fields", 400));
 
-  // Create a token with user info (no DB yet)
   const existingUser = await User.findOne({ email });
   if (existingUser) return next(new ErrorHandler("User already registered", 400));
 
@@ -18,8 +17,7 @@ export const registerUser = TryCatch(async (req, res, next) => {
     process.env.JWT_SECRET,
     { expiresIn: "10m" }
   );
-
-  // Email setup
+ 
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -46,7 +44,7 @@ export const registerUser = TryCatch(async (req, res, next) => {
 
   res
     .status(200)
-    .json({ message: "Verification email sent. Please check your inbox." });
+    .json({ message: "Verification email sent. Please check your inbox." , token});
 });
 
 export const verifyEmailAndCreateUser = TryCatch(async (req, res, next) => {
@@ -142,6 +140,7 @@ export const loginUser = TryCatch(async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        lastLogin: user.lastLogin
       },
     });
 });

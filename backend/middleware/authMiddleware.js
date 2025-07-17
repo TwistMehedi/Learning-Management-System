@@ -1,11 +1,14 @@
 import jwt from "jsonwebtoken";
- 
+import TryCatch from "./../utils/TryCatch.js"
+import { ErrorHandler } from "../utils/ErrorHandler.js";
+import User from "../models/user.model.js";
+
 
 export const isAuthenticated = TryCatch(async (req, res, next) => {
    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-   if (!token) next(new ErrorHandler("Token is required", 401));
+   if (!token) next(new ErrorHandler("You are unathorized", 401));
   
-  if (!token) next(new ErrorHandler("Token is required", 401));
+  // if (!token) next(new ErrorHandler("Token is required", 401));
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decoded.id).select("-password");

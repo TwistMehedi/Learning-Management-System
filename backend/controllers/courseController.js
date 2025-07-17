@@ -1,8 +1,9 @@
 import TryCatch from "./../utils/TryCatch.js";
 import Course from "../models/course.model.js";
-import { ErrorHandler } from "./../utils/ErrorHandler";
+import { ErrorHandler } from "./../utils/ErrorHandler.js";
 import { deleteImage, uploadFile } from "../utils/cloudinary.js";
 import Lesson from "../models/leson.model.js";
+
 
 export const createCourse = TryCatch(async (req, res, next) => {
   const { title, description, category, price, level } = req.body;
@@ -31,7 +32,7 @@ export const createCourse = TryCatch(async (req, res, next) => {
     price,
     thumbnail: image,
     level,
-    instructor: req.user._id,
+    instructor: req.user._id
   });
 
   res.status(201).json({
@@ -48,7 +49,9 @@ export const getAllCourses = TryCatch(async (req, res, next) => {
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  let query = {};
+  let query = {
+    
+  };
 
   if (search) {
     query.title = { $regex: search, $options: "i" };
@@ -144,8 +147,10 @@ export const getCourseDetails = TryCatch(async (req, res, next) => {
 });
 
 export const updateCourse = TryCatch(async (req, res, next) => { 
+
   const course = await Course.findById(req.params.id);
 
+  // console.log(req.body,"body")
   if (!course) return next(new ErrorHandler("Course not found", 404));
 
   const isOwner = course.instructor.toString() === req.user._id.toString();
@@ -181,10 +186,13 @@ export const updateCourse = TryCatch(async (req, res, next) => {
       return next(new ErrorHandler("Invalid course level", 400));
     }
     course.level = level;
-  }
+  };
+
+  if(course) course.userId = req.user._id
 
   await course.save();
 
+ 
   res.status(200).json({
     message: "Course updated successfully",
     success: true,

@@ -18,7 +18,7 @@ const courseSchema = new mongoose.Schema(
     studentsEnrolled: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     level: {
       type: String,
-      enum: ["Beginner", "Intermediate", "Advanced"],
+      enum: ["Beginner", "Intermediate", "advanced"],
       default: "Beginner",
     },
     priceRange: {
@@ -28,6 +28,11 @@ const courseSchema = new mongoose.Schema(
     isPublished: {
       type: Boolean,
       default: false,
+    },
+    status:{
+      type: String,
+      enum: ["active", "pending"],
+      default: "pending"
     },
     duration: {
       type: String,

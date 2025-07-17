@@ -1,6 +1,7 @@
 import express from "express";
 import { isAuthenticated } from "../middleware/authMiddleware.js";
 import { buyCourse, handleStripeWebhook, verifyEnrollment } from "../controllers/paymentController.js";
+import bodyParser from "body-parser";
 
 const router = express.Router();
 

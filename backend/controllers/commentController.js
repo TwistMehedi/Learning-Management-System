@@ -86,7 +86,7 @@ export const deleteComment = TryCatch(async (req, res, next) => {
   // Check ownership (only comment owner can delete)
   if (comment.user.toString() !== userId.toString()) {
     return next(new ErrorHandler("You are not authorized to delete this comment", 403));
-  }
+  };
 
   // Recursive function to delete all nested replies
   async function deleteReplies(parentId) {
