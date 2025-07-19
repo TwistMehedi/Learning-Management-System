@@ -1,15 +1,20 @@
- 
- import {Routes, Route} from "react-router";
+import { Routes, Route } from "react-router";
+import Navbar from "./components/Navber/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
-
   return (
-     <Routes>
-      <Route path="/" element={<h1>THis is home page</h1>}></Route>
-      <Route path="/login" element={<h1>THis is login page</h1>}></Route>
-      <Route path="/register" element={<h1>THis is register page</h1>}></Route>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/login" element={<Login />}></Route>
+        <Route path="/register" element={<Register />}></Route>
       </Routes>
-  )
+    </>
+  );
 }
 
-export default App
+export default App;
