@@ -5,8 +5,11 @@ import Course from "../models/course.model.js";
 import { deleteVideo, uploadFile } from "../utils/cloudinary.js";
 
 export const createLesson = TryCatch(async (req, res, next) => {
+  
   const { title, courseId } = req.body;
+
   const file = req.file;
+
 
   if (!title || !courseId) {
     return next(new ErrorHandler("Title and Course ID are required", 400));
@@ -21,7 +24,6 @@ export const createLesson = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Course not found", 404));
   };
 
-  
   const videoResult = await uploadFile(file.path);
  
   const lesson = await Lesson.create({

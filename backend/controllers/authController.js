@@ -12,8 +12,11 @@ export const registerUser = TryCatch(async (req, res, next) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) return next(new ErrorHandler("User already registered", 400));
 
+  const valiadteRole = ["student", "instructor", "admin"];
+  const userRole = valiadteRole.includes(role) ? role : "student";
+ 
   const token = jwt.sign(
-    { name, email, password, role, phone, socialLinks },
+    { name, email, password, role: userRole , phone, socialLinks },
     process.env.JWT_SECRET,
     { expiresIn: "10m" }
   );
@@ -35,7 +38,7 @@ export const registerUser = TryCatch(async (req, res, next) => {
     html: `
         <p>Hello <strong>${name}</strong>,</p>
         <p>Please click the link below to verify your email and complete your registration:</p>
-        <a href="http://localhost:5000/api/auth/verify-email?token=${token}">Verify Email</a>
+        <a href="http://localhost:5173/verify-email?token=${token}">Verify Email</a>
         <p>This link will expire in 10 minutes.</p>
       `,
   };
@@ -76,6 +79,7 @@ export const verifyEmailAndCreateUser = TryCatch(async (req, res, next) => {
       twitter: socialLinks?.twitter || "",
     },
     lastLogin: new Date(),
+    isVerified: true
   });
 
   const authToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {

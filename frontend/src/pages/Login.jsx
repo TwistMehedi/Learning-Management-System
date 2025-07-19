@@ -1,7 +1,11 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import axios from "axios";
+import { useLoginUserMutation } from "../redux/api/authApi";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { setUser } from "../redux/slice/userSlice";
+import { useNavigate } from "react-router";
 
 const Login = () => {
   const {
@@ -10,14 +14,19 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
+  const [loginUser] = useLoginUserMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const onSubmit = async (data) => {
     try {
-      const res = await axios.post("/api/v1/auth/login", data, {
-        withCredentials: true,
-      });
-      console.log(res.data.message); // or toast notification
+      const res = await loginUser(data).unwrap();
+      dispatch(setUser(res.user));
+      toast.success(res.message);
+      navigate("/")
     } catch (error) {
       console.error(error.response?.data?.message || "Login failed");
+      toast.error(error.data.message);
     }
   };
 
@@ -29,7 +38,9 @@ const Login = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Login</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">
+          Login
+        </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="form-control">
             <label className="label">Email</label>
@@ -40,7 +51,9 @@ const Login = () => {
               {...register("email", { required: "Email is required" })}
             />
             {errors.email && (
-              <span className="text-red-500 text-sm mt-1">{errors.email.message}</span>
+              <span className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </span>
             )}
           </div>
 
@@ -53,12 +66,23 @@ const Login = () => {
               {...register("password", { required: "Password is required" })}
             />
             {errors.password && (
-              <span className="text-red-500 text-sm mt-1">{errors.password.message}</span>
+              <span className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </span>
             )}
           </div>
 
-          <button className="btn btn-primary w-full mt-4">Login</button>
+          <button type="submit" className="btn btn-primary w-full mt-4">
+            Login
+          </button>
         </form>
+
+        <p className="text-center mt-4 text-sm text-gray-600">
+          Don't have an account?{" "}
+          <a href="/register" className="text-blue-600 hover:underline">
+            Register here
+          </a>
+        </p>
       </motion.div>
     </div>
   );

@@ -9,6 +9,7 @@ import courseRouter from "./routes/course.routes.js";
 import lessonRouter from "./routes/lesson.route.js";
 import paymentRouter from "./routes/payment.routes.js";
 import commentRouter from "./routes/comment.route.js";
+import userRouter from "./routes/user.routes.js";
 
 export const app = express();
 
@@ -24,6 +25,7 @@ app.use(cors({
 app.use(errorMiddleware);
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/user", userRouter);
 app.use("/api/v1/course", courseRouter);
 app.use("/api/v1/lesson", lessonRouter);
 app.use("/api/v1/payment", paymentRouter);

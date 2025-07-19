@@ -46,9 +46,8 @@ export const createComment = TryCatch(async (req, res, next) => {
   })
     .sort({ createdAt: -1 })
     .populate("user", "name image")
-    .lean(); // lean() করলে JS object আকারে আসবে, nested property যোগ করা সহজ হবে
+    .lean();
 
-  // রিকার্সিভ ভাবে reply আনবে
   async function getReplies(commentId) {
     const replies = await Comment.find({ parentComment: commentId })
       .sort({ createdAt: 1 })
@@ -74,6 +73,7 @@ export const createComment = TryCatch(async (req, res, next) => {
 });
 
 export const deleteComment = TryCatch(async (req, res, next) => {
+  
   const { commentId } = req.params;
   const userId = req.user._id;
 

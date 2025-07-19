@@ -1,65 +1,105 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router";
+import { useLogoutUserMutation } from "../../redux/api/authApi";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUser } from "../../redux/slice/userSlice";
+import toast from "react-hot-toast";
+import { Menu, X } from "lucide-react"; // optional icons
 
-
- const navLinks = [
-  {label: "Home",  path:"/"},
-  {label: "Login",  path:"/login"},
-  {label: "Register", path:"/register"},
-]
+const navLinks = [
+  { label: "Home", path: "/" },
+  { label: "Login", path: "/login" },
+  { label: "Register", path: "/register" },
+];
 
 const Navbar = () => {
-  
+  const user = useSelector((state) => state.user);
+  const [logoutUser] = useLogoutUserMutation();
+  const dispatch = useDispatch();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      const res = await logoutUser().unwrap();
+      dispatch(clearUser(null));
+      toast.success(res.message);
+    } catch (error) {
+      toast.error(error?.data?.message || "Logout failed");
+    }
+  };
+
   return (
-    <motion.div
-      className="navbar bg-purple-600 text-white shadow-sm"
+    <motion.nav
+      className="bg-purple-600 text-white shadow-md"
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="flex-1">
-        <motion.li
-          className="btn btn-ghost text-xl text-white"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 300 }}
-        >
-          <Link to={"/"}>Programing</Link>
-        </motion.li>
-      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
+          {/* Logo */}
+          <div className="flex-shrink-0 flex items-center text-xl font-bold">
+            <Link to="/" className="text-white">Programming</Link>
+          </div>
 
-      <div className="flex-none">
-        <motion.ul
-          className="menu menu-horizontal px-1 gap-5"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.1,
-              },
-            },
-          }}
-        >
-          {navLinks.map((item, index) => (
-            <motion.li
-              key={index}
-              variants={{
-                hidden: { opacity: 0, y: -10 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
+          {/* Desktop Menu */}
+          <div className="hidden md:flex space-x-6 items-center">
+            {navLinks.map((item, index) => (
               <Link
+                key={index}
                 to={item.path}
-                className="text-white"
+                className="hover:text-gray-300 transition duration-200"
               >
                 {item.label}
               </Link>
-            </motion.li>
-          ))}
-        </motion.ul>
+            ))}
+            {user && (
+              <button
+                onClick={handleLogout}
+                className="hover:text-gray-300 transition duration-200"
+              >
+                Logout
+              </button>
+            )}
+          </div>
+
+          {/* Mobile Toggle Button */}
+          <div className="md:hidden flex items-center">
+            <button onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {isOpen && (
+          <div className="md:hidden mt-2 space-y-2">
+            {navLinks.map((item, index) => (
+              <Link
+                key={index}
+                to={item.path}
+                className="block text-white px-3 py-2 rounded-md hover:bg-purple-700"
+                onClick={() => setIsOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+            {user && (
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }}
+                className="block text-white px-3 py-2 rounded-md hover:bg-purple-700 w-full text-left"
+              >
+                Logout
+              </button>
+            )}
+          </div>
+        )}
       </div>
-    </motion.div>
+    </motion.nav>
   );
 };
 
