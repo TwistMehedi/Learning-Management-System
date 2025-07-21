@@ -141,3 +141,21 @@ export const updateLesson = TryCatch(async (req, res, next) => {
     lesson,
   });
 });
+
+
+export const freeLesson = TryCatch(async(req, res, next)=>{
+  const {courseId} = req.params;
+
+  const lessons = await Lesson.find({course: courseId}).limit(3);
+  // console.log(lessons);
+
+  if (!lessons || lessons.length === 0) {
+    return next(new ErrorHandler("No lessons found", 404));
+  }
+
+  res.status(200).json({
+    message: "Free 3 lesson fetched",
+    success: true,
+    lessons
+  })
+})

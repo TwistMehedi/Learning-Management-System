@@ -23,7 +23,7 @@ const courseSchema = new mongoose.Schema(
     },
     priceRange: {
       min: { type: Number, default: 0 },
-      max: { type: Number, default: 0 },
+      max: { type: Number, default: 10000 },
     },
     isPublished: {
       type: Boolean,

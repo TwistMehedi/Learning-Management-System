@@ -150,8 +150,7 @@ export const updateCourse = TryCatch(async (req, res, next) => {
 
   const course = await Course.findById(req.params.id);
 
-  // console.log(req.body,"body")
-  if (!course) return next(new ErrorHandler("Course not found", 404));
+   if (!course) return next(new ErrorHandler("Course not found", 404));
 
   const isOwner = course.instructor.toString() === req.user._id.toString();
   const isAdmin = req.user.role === "admin";
@@ -160,7 +159,7 @@ export const updateCourse = TryCatch(async (req, res, next) => {
     return next(
       new ErrorHandler("You are not authorized to update this course", 403)
     );
-  }
+  };
 
   const { title, description, category, price, level } = req.body;
   const file = req.file;
@@ -174,7 +173,7 @@ export const updateCourse = TryCatch(async (req, res, next) => {
       public_id: imageUploadResult.public_id,
       secure_url: imageUploadResult.secure_url,
     };
-  }
+  };
 
   if (title) course.title = title;
   if (description) course.description = description;
@@ -192,10 +191,24 @@ export const updateCourse = TryCatch(async (req, res, next) => {
 
   await course.save();
 
- 
   res.status(200).json({
     message: "Course updated successfully",
     success: true,
     course,
   });
+});
+
+export const categories = TryCatch(async(req, res, next)=>{
+  const categoris = await Course.distinct("category");
+  if(categoris.length < 0) {
+    return next(new ErrorHandler("Categories not found", 404));
+  };
+
+  // console.log(categoris,"categoris")
+  res.status(200).json({
+    message: "Category fetched",
+    success: true,
+    categoris
+  })
+
 });

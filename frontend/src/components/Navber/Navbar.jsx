@@ -7,14 +7,8 @@ import { clearUser } from "../../redux/slice/userSlice";
 import toast from "react-hot-toast";
 import { Menu, X } from "lucide-react"; // optional icons
 
-const navLinks = [
-  { label: "Home", path: "/" },
-  { label: "Login", path: "/login" },
-  { label: "Register", path: "/register" },
-];
-
 const Navbar = () => {
-  const user = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const [logoutUser] = useLogoutUserMutation();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
@@ -40,20 +34,38 @@ const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center text-xl font-bold">
-            <Link to="/" className="text-white">Programming</Link>
+            <Link to="/" className="text-white">
+              Programming
+            </Link>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6 items-center">
-            {navLinks.map((item, index) => (
+            <Link
+              to={"/"}
+              className="hover:text-gray-300 transition duration-200"
+            >
+              Home
+            </Link>
+
+            {!user && (
               <Link
-                key={index}
-                to={item.path}
+                to={"/login"}
                 className="hover:text-gray-300 transition duration-200"
               >
-                {item.label}
+                Login
               </Link>
-            ))}
+            )}
+
+            {!user && (
+              <Link
+                to={"/register"}
+                className="hover:text-gray-300 transition duration-200"
+              >
+                Register
+              </Link>
+            )}
+
             {user && (
               <button
                 onClick={handleLogout}
@@ -85,17 +97,6 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
-            {user && (
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setIsOpen(false);
-                }}
-                className="block text-white px-3 py-2 rounded-md hover:bg-purple-700 w-full text-left"
-              >
-                Logout
-              </button>
-            )}
           </div>
         )}
       </div>

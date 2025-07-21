@@ -10,6 +10,7 @@ import lessonRouter from "./routes/lesson.route.js";
 import paymentRouter from "./routes/payment.routes.js";
 import commentRouter from "./routes/comment.route.js";
 import userRouter from "./routes/user.routes.js";
+import statsRouter from "./routes/stats.route.js";
 
 export const app = express();
 
@@ -30,5 +31,6 @@ app.use("/api/v1/course", courseRouter);
 app.use("/api/v1/lesson", lessonRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/comment", commentRouter);
+app.use("/api/v1/stats", statsRouter );
 
 
