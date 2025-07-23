@@ -9,6 +9,7 @@ import { Menu, X } from "lucide-react"; // optional icons
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.user);
+   const currentUser = user?.user;
   const [logoutUser] = useLogoutUserMutation();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +49,16 @@ const Navbar = () => {
               Home
             </Link>
 
-            {!user && (
+            {currentUser && currentUser.role === "student" && (
+              <Link
+                to={"/dashbord"}
+                className="hover:text-gray-300 transition duration-200"
+              >
+                StudentDashboard
+              </Link>
+            )}
+
+            {!currentUser && (
               <Link
                 to={"/login"}
                 className="hover:text-gray-300 transition duration-200"
@@ -57,7 +67,7 @@ const Navbar = () => {
               </Link>
             )}
 
-            {!user && (
+            {!currentUser && (
               <Link
                 to={"/register"}
                 className="hover:text-gray-300 transition duration-200"
@@ -66,7 +76,7 @@ const Navbar = () => {
               </Link>
             )}
 
-            {user && (
+            {currentUser && (
               <button
                 onClick={handleLogout}
                 className="hover:text-gray-300 transition duration-200"

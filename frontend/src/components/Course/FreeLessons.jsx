@@ -5,6 +5,7 @@ const FreeLessons = ({courseId}) => {
 
   const [showLessons, setShowLessons] = useState(false);
   const { data, isLoading, error } = useFreeLessonsQuery(courseId);
+  
   const freeLessons = data?.lessons;
 
   const toggleLessons = () => {

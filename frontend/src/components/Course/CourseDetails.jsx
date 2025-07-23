@@ -3,16 +3,43 @@ import { useParams } from "react-router";
 import { FaStar } from "react-icons/fa";
 import { useGetCourseQuery } from "../../redux/api/courses/courseApi";
 import FreeLessons from "./FreeLessons";
+import {loadStripe} from '@stripe/stripe-js';
+import { useAddPaymentMutation } from "../../redux/api/payment/paymentApi";
+import { toast } from 'react-hot-toast';
+import { useSelector } from "react-redux";
+
 
 const CourseDetails = () => {
   const { id } = useParams();
-  console.log(id);
+  // console.log(id);
+  // const {user} = useSelector((state)=> state.user);
+  // const dat = (user?.user)
   const { data, isLoading, isError } = useGetCourseQuery(id);
+  const [addPayment] = useAddPaymentMutation();
 
   if (isLoading) return <div>Loading...</div>;
   if (isError || !data?.course) return <div>Course not found.</div>;
 
   const course = data.course;
+
+const makePayment = async () => {
+  const stripe = await loadStripe('pk_test_51RE7tiAo2zdTrEmE0JD43j1ttLSgMUc2waBwm6X9pHwfoNC7bsf5Hy84OFZF8Y0jbKdlxVKG8K9VIw7WnoLKD0sq00KZZgHFyv');
+
+  try {
+    const res = await addPayment({ course }); // ✅ wrap it properly
+    const sessionId = res?.data?.id;
+    console.log(res);
+      
+    if (!sessionId) throw new Error("You alredy purchase this course");
+
+    await stripe.redirectToCheckout({ sessionId }); // ✅
+  } catch (error) {
+      const message = error?.data?.message || error?.error || error.message || "Payment failed";
+    toast.error(message);
+    console.error("Payment error:", error);
+  }
+};
+
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -84,24 +111,16 @@ const CourseDetails = () => {
             <strong>Price:</strong>{" "}
             {course.price === 0 ? "Free" : `৳${course.price}`}
           </p>
-          {course.discount && course.price !== 0 && (
-            <p>
-              <strong>Discount:</strong> {course.discount}% off
-            </p>
-          )}
-          {course.price !== 0 && (
-            <p>
-              <strong>Total:</strong> ৳
-              {(
-                course.price -
-                (course.price * (course.discount || 0)) / 100
-              ).toFixed(2)}
-            </p>
-          )}
+
+          <p>
+            <strong>Total:</strong>{" "}
+            {`৳${course.price}`}
+          </p>
+         
           <button
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
             disabled={course.price === 0}
-            onClick={() => alert("Buy feature coming soon")}
+            onClick={makePayment}
           >
             Buy Now
           </button>

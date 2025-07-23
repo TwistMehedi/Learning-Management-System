@@ -12,10 +12,17 @@ import { userApi } from "./redux/api/userApi";
 import { setUser } from "./redux/slice/userSlice";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import CourseDetails from "./components/Course/CourseDetails";
+import PaymentSuccess from "./components/Payment/PaymentSuccess";
+import Dashbord from "./pages/Dashbord";
+import Profile from "./components/Dashbord/Profile";
+import EnrollCourses from "./components/Dashbord/EnrollCourses";
+import Charts from "./components/Dashbord/Charts";
 
 function App() {
-  const {user} = useSelector((state) => state.user);
-  console.log(user);
+  const { user } = useSelector((state) => state.user);
+  // console.log(user);
+  const currentUser = user?.user;
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -46,7 +53,7 @@ function App() {
         <Route
           path="/login"
           element={
-            <PrivateRoute isAuthenticated={user ? false : true} redirect="/">
+            <PrivateRoute isAuthenticated={currentUser ? false : true} redirect="/">
               <Login />
             </PrivateRoute>
           }
@@ -54,7 +61,7 @@ function App() {
         <Route
           path="/register"
           element={
-            <PrivateRoute isAuthenticated={user ? false : true} redirect="/">
+            <PrivateRoute isAuthenticated={currentUser ? false : true} redirect="/">
               <Register />
             </PrivateRoute>
           }
@@ -63,6 +70,17 @@ function App() {
         <Route path="/verify-email" element={<EmailVerify />}></Route>
         <Route path="/courses" element={<Courses />}></Route>
         <Route path="/course/:id" element={<CourseDetails />}></Route>
+        <Route path="/payment/success" element={<PaymentSuccess />}></Route>
+        <Route path="/dashbord" element={
+          <PrivateRoute isAuthenticated={currentUser ? true: false} redirect="/login">
+            <Dashbord />
+          </PrivateRoute>
+        }>
+          <Route index element={<Profile />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="courses" element={<EnrollCourses />} />
+          <Route path="charts" element={<Charts />} />
+        </Route>
       </Routes>
     </>
   );

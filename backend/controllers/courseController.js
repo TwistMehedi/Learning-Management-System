@@ -3,6 +3,7 @@ import Course from "../models/course.model.js";
 import { ErrorHandler } from "./../utils/ErrorHandler.js";
 import { deleteImage, uploadFile } from "../utils/cloudinary.js";
 import Lesson from "../models/leson.model.js";
+import Purchase from "../models/payment.model.js";
 
 
 export const createCourse = TryCatch(async (req, res, next) => {
@@ -211,4 +212,15 @@ export const categories = TryCatch(async(req, res, next)=>{
     categoris
   })
 
+});
+
+export const getEnrollUserCourses = TryCatch(async(req, res, next)=>{
+  const userId = req.user._id;
+
+  const enrollCourses = await Purchase.find({
+    userId,
+    paymentStatus: "success"
+  }).populate("courseId");
+
+  res.status(200).json(enrollCourses);
 });

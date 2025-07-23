@@ -6,6 +6,7 @@ export const authApi = createApi({
     baseUrl: "http://localhost:3000/api/v1/auth/",
     credentials: "include",
   }),
+  tagTypes: ["User"], 
   endpoints: (builder) => ({
     createUser: builder.mutation({
       query: (formData) => ({
@@ -13,9 +14,11 @@ export const authApi = createApi({
         method: "POST",
         body: formData,
       }),
+      invalidatesTags: ["User"],
     }),
     verifyEmail: builder.query({
       query: (token) => `verify-email?token=${token}`,
+      providesTags: ["User"]
     }),
     loginUser: builder.mutation({
       query: (loginData) => ({
@@ -23,13 +26,14 @@ export const authApi = createApi({
         method: "POST",
         body: loginData,
       }),
+      invalidatesTags: ["User"],
     }),
-
     logoutUser: builder.mutation({
       query: () => ({
         url: "logout",
         method: "GET",
       }),
+      invalidatesTags: ["User"],
     }),
   }),
 });
