@@ -1,7 +1,11 @@
  
+import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router';
 
 const PrivateRoute = ({ isAuthenticated, redirect, children, allowedRoles = [] }) => {
+
+  const {user} = useSelector(state=> state.user);
+  const role = user?.user?.role;
 
   if (!isAuthenticated) {
     return <Navigate to={redirect} replace />;

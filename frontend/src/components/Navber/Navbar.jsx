@@ -9,7 +9,7 @@ import { Menu, X } from "lucide-react"; // optional icons
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.user);
-   const currentUser = user?.user;
+  const currentUser = user?.user;
   const [logoutUser] = useLogoutUserMutation();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +57,22 @@ const Navbar = () => {
                 StudentDashboard
               </Link>
             )}
+
+            {currentUser && currentUser.role == "instructor" && (
+              <Link
+                to={"/dashbord/instructor"}
+                className="hover:text-gray-300 transition duration-200"
+              >
+                InstructorDashboard
+              </Link>
+            )}
+
+            <Link
+              to={"/dashbord/admin"}
+              className="hover:text-gray-300 transition duration-200"
+            >
+              AdminDashboard
+            </Link>
 
             {!currentUser && (
               <Link

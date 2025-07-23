@@ -5,8 +5,8 @@ import { deleteImage, uploadFile } from "../utils/cloudinary.js";
 import Lesson from "../models/leson.model.js";
 import Purchase from "../models/payment.model.js";
 
-
 export const createCourse = TryCatch(async (req, res, next) => {
+  
   const { title, description, category, price, level } = req.body;
   const file = req.file;
 
@@ -33,7 +33,7 @@ export const createCourse = TryCatch(async (req, res, next) => {
     price,
     thumbnail: image,
     level,
-    instructor: req.user._id
+    instructor: req.user._id,
   });
 
   res.status(201).json({
@@ -50,9 +50,7 @@ export const getAllCourses = TryCatch(async (req, res, next) => {
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  let query = {
-    
-  };
+  let query = {};
 
   if (search) {
     query.title = { $regex: search, $options: "i" };
@@ -131,12 +129,13 @@ export const deleteCourse = TryCatch(async (req, res, next) => {
     message: "Course and its lessons deleted successfully",
     success: true,
   });
-  
 });
 
-
 export const getCourseDetails = TryCatch(async (req, res, next) => {
-  const course = await Course.findById(req.params.id).populate("instructor", "name");
+  const course = await Course.findById(req.params.id).populate(
+    "instructor",
+    "name"
+  );
 
   if (!course) return next(new ErrorHandler("Course not found", 404));
 
@@ -147,11 +146,10 @@ export const getCourseDetails = TryCatch(async (req, res, next) => {
   });
 });
 
-export const updateCourse = TryCatch(async (req, res, next) => { 
-
+export const updateCourse = TryCatch(async (req, res, next) => {
   const course = await Course.findById(req.params.id);
 
-   if (!course) return next(new ErrorHandler("Course not found", 404));
+  if (!course) return next(new ErrorHandler("Course not found", 404));
 
   const isOwner = course.instructor.toString() === req.user._id.toString();
   const isAdmin = req.user.role === "admin";
@@ -160,7 +158,7 @@ export const updateCourse = TryCatch(async (req, res, next) => {
     return next(
       new ErrorHandler("You are not authorized to update this course", 403)
     );
-  };
+  }
 
   const { title, description, category, price, level } = req.body;
   const file = req.file;
@@ -174,7 +172,7 @@ export const updateCourse = TryCatch(async (req, res, next) => {
       public_id: imageUploadResult.public_id,
       secure_url: imageUploadResult.secure_url,
     };
-  };
+  }
 
   if (title) course.title = title;
   if (description) course.description = description;
@@ -186,9 +184,9 @@ export const updateCourse = TryCatch(async (req, res, next) => {
       return next(new ErrorHandler("Invalid course level", 400));
     }
     course.level = level;
-  };
+  }
 
-  if(course) course.userId = req.user._id
+  if (course) course.userId = req.user._id;
 
   await course.save();
 
@@ -199,28 +197,39 @@ export const updateCourse = TryCatch(async (req, res, next) => {
   });
 });
 
-export const categories = TryCatch(async(req, res, next)=>{
+export const categories = TryCatch(async (req, res, next) => {
   const categoris = await Course.distinct("category");
-  if(categoris.length < 0) {
+  if (categoris.length < 0) {
     return next(new ErrorHandler("Categories not found", 404));
-  };
+  }
 
   // console.log(categoris,"categoris")
   res.status(200).json({
     message: "Category fetched",
     success: true,
-    categoris
-  })
-
+    categoris,
+  });
 });
 
-export const getEnrollUserCourses = TryCatch(async(req, res, next)=>{
+export const getEnrollUserCourses = TryCatch(async (req, res, next) => {
   const userId = req.user._id;
 
   const enrollCourses = await Purchase.find({
     userId,
-    paymentStatus: "success"
+    paymentStatus: "success",
   }).populate("courseId");
 
   res.status(200).json(enrollCourses);
+});
+
+export const instructorByCourses = TryCatch(async (req, res, next) => {
+  const userId = req.user._id;
+
+  const instructorCourses = await Course.find({ instructor: userId });
+
+  res.status(200).json({
+    success: true,
+    courses: instructorCourses,
+  });
+
 });

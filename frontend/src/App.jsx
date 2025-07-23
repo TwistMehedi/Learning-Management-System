@@ -17,6 +17,15 @@ import Dashbord from "./pages/Dashbord";
 import Profile from "./components/Dashbord/Profile";
 import EnrollCourses from "./components/Dashbord/EnrollCourses";
 import Charts from "./components/Dashbord/Charts";
+import InstructorDashboard from "./pages/InstructorDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import ProfileInstructor from "./components/InstructorDashboard/ProfileInstructor";
+import CreateCourses from "./components/InstructorDashboard/CreateCourses";
+import InstructorCourses from "./components/InstructorDashboard/InstructorCourses";
+import InstructorCharts from "./components/InstructorDashboard/InstructorCharts";
+import AdminProfile from "./components/AdminDashboard/AdminProfile";
+import AllCourses from "./components/AdminDashboard/AllCourses";
+import AdminCharts from "./components/AdminDashboard/AdminCharts";
 
 function App() {
   const { user } = useSelector((state) => state.user);
@@ -80,6 +89,23 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="courses" element={<EnrollCourses />} />
           <Route path="charts" element={<Charts />} />
+        </Route>
+        <Route path="/dashbord/instructor" element={
+          <PrivateRoute isAuthenticated={currentUser ? true : false} allowedRoles={["instructor"]} redirect={"/"}>
+            <InstructorDashboard/>
+          </PrivateRoute>
+          }>
+            <Route index element={<ProfileInstructor />} />
+            <Route path="profile" element={<ProfileInstructor />}></Route>
+            <Route path="create/course" element={<CreateCourses />}></Route>
+            <Route path="courses" element={<InstructorCourses />}></Route>
+            <Route path="charts" element={<InstructorCharts />}></Route>
+        </Route>
+        <Route path="/dashbord/admin" element={<AdminDashboard/>}>
+        <Route index element={<AdminProfile />}></Route>
+        <Route path="profile" element={<AdminProfile />}></Route>
+        <Route path="all/courses" element={<AllCourses />}></Route>
+        <Route path="charts" element={<AdminCharts />}></Route>
         </Route>
       </Routes>
     </>
