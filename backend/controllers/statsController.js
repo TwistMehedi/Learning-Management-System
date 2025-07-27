@@ -1,9 +1,9 @@
 import TryCatch from "./../utils/TryCatch.js";
 import Course from "./../models/course.model.js";
 import { ErrorHandler } from "../utils/ErrorHandler.js";
+import Purchase from "../models/payment.model.js";
 
 export const totalCourse = TryCatch(async (req, res, next) => {
-
   const startMonth = new Date();
   startMonth.setDate(1);
   startMonth.setHours(0, 0, 0, 0);
@@ -30,27 +30,29 @@ export const totalCourse = TryCatch(async (req, res, next) => {
   });
 
   const createCourseLastSixMonth = Course.countDocuments({
-    createdAt:{
-        $gte: sixMonthStart,
-        $lte: sixMonthEnd
-    }
+    createdAt: {
+      $gte: sixMonthStart,
+      $lte: sixMonthEnd,
+    },
   });
 
-  const totalSellCourse = Course.find({studentsEnrolled:{$exists: true, $ne: []}});
+  const totalSellCourse = Course.find({
+    studentsEnrolled: { $exists: true, $ne: [] },
+  });
 
-
-  const [totalCourses, createCourse, sixMonthRangCourse, tcourseTotalSell] = await Promise.all([
-    courseCount,
-    createCourseThisMonth,
-    createCourseLastSixMonth,
-    totalSellCourse
-  ]);
+  const [totalCourses, createCourse, sixMonthRangCourse, tcourseTotalSell] =
+    await Promise.all([
+      courseCount,
+      createCourseThisMonth,
+      createCourseLastSixMonth,
+      totalSellCourse,
+    ]);
 
   const courses = {
     totalCourses,
     onMotnhCourseCreate: createCourse,
     sixMonthRangCourse,
-    totalSell: tcourseTotalSell.length
+    totalSell: tcourseTotalSell.length,
   };
 
   res.status(200).json({
@@ -59,3 +61,50 @@ export const totalCourse = TryCatch(async (req, res, next) => {
   });
 });
 
+export const instructor = TryCatch(async (req, res, next) => {
+  const userId = req.user?._id;
+  if (!userId) {
+    return res.status(400).json({ message: "User not found" });
+  }
+
+  const courses = await Course.find({ instructor: userId });
+
+  const totalCourses = courses.length;
+
+  const courseIds = courses.map((course) => course._id);
+
+  const totalSell = await Purchase.countDocuments({
+    courseId: { $in: courseIds },
+    paymentStatus: "success",
+  });
+
+  const uniqueStudentIds = await Purchase.countDocuments({
+    userId: { $in: userId },
+    paymentStatus: "success",
+  });
+
+  const monthlySales = await Purchase.aggregate([
+    {
+      $match: {
+        courseId: { $in: courseIds },
+        paymentStatus: "success",
+      },
+    },
+    {
+      $group: {
+        _id: {
+          $dateToString: { format: "%Y-%m", date: "$createdAt" },
+        },
+        totalSales: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  res.status(200).json({
+    totalCourses,
+    totalSell,
+    uniqueStudentIds,
+    monthlySales,
+  });
+});

@@ -4,9 +4,11 @@ import {
   createCourse,
   deleteCourse,
   getAllCourses,
+  getAllCoursesForAdmin,
   getCourseDetails,
   getEnrollUserCourses,
   instructorByCourses,
+  latestCourses,
   updateCourse,
 } from "../controllers/courseController.js";
 import {
@@ -25,6 +27,15 @@ router
     upload.single("image"),
     createCourse
   );
+
+router
+  .route("/all/courses/for/admin")
+  .get(
+    isAuthenticated,
+    authorizeRoles("admin"),
+    getAllCoursesForAdmin
+  );
+
 router.route("/courses").get(getAllCourses);
 router
   .route("/instructor-courses")
@@ -49,5 +60,7 @@ router
     upload.single("image"),
     updateCourse
   );
+
+  router.route("/latest-courses").get(latestCourses)
 
 export default router;

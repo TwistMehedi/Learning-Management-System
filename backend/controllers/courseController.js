@@ -6,7 +6,6 @@ import Lesson from "../models/leson.model.js";
 import Purchase from "../models/payment.model.js";
 
 export const createCourse = TryCatch(async (req, res, next) => {
-  
   const { title, description, category, price, level } = req.body;
   const file = req.file;
 
@@ -47,7 +46,7 @@ export const getAllCourses = TryCatch(async (req, res, next) => {
   const { search, price, category, sort } = req.query;
 
   const page = Number(req.query.page) || 1;
-  const limit = 10;
+  const limit = 2;
   const skip = (page - 1) * limit;
 
   let query = {};
@@ -147,8 +146,10 @@ export const getCourseDetails = TryCatch(async (req, res, next) => {
 });
 
 export const updateCourse = TryCatch(async (req, res, next) => {
-  const course = await Course.findById(req.params.id);
+  const { id } = req.params;
 
+  const course = await Course.findById(id);
+  // console.log(course)
   if (!course) return next(new ErrorHandler("Course not found", 404));
 
   const isOwner = course.instructor.toString() === req.user._id.toString();
@@ -160,7 +161,9 @@ export const updateCourse = TryCatch(async (req, res, next) => {
     );
   }
 
-  const { title, description, category, price, level } = req.body;
+  // console.log(req.body);
+
+  const { title, description, category, price, level, status } = req.body;
   const file = req.file;
 
   if (file) {
@@ -186,8 +189,8 @@ export const updateCourse = TryCatch(async (req, res, next) => {
     course.level = level;
   }
 
-  if (course) course.userId = req.user._id;
-
+  if (status) course.status = status;
+ 
   await course.save();
 
   res.status(200).json({
@@ -231,5 +234,26 @@ export const instructorByCourses = TryCatch(async (req, res, next) => {
     success: true,
     courses: instructorCourses,
   });
+});
 
+
+export const getAllCoursesForAdmin = TryCatch(async (req, res, next) => {
+  const allCoursesForAdmin = await Course.find().populate("instructor", "name image");
+  
+  return res.status(200).json({
+    success: true,
+    courses: allCoursesForAdmin,
+  });
+});
+
+
+export const latestCourses = TryCatch(async (req, res, next) => {
+  const courses = await Course.find()
+    .sort({ createdAt: -1 })
+    .limit(5);
+
+  res.status(200).json({
+    success: true,
+    courses,
+  });
 });

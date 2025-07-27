@@ -1,27 +1,23 @@
-import React from 'react'
-import { useNavigate } from 'react-router'
-import { toast } from 'react-hot-toast'
-import { useAllCourseByInstructorQuery } from '../../redux/api/courses/courseApi'
+import React from "react";
+import { Link, Outlet, useNavigate } from "react-router";
+import { toast } from "react-hot-toast";
+import { useAllCourseByInstructorQuery, useDeleteCourseMutation } from "../../redux/api/courses/courseApi";
 
 const InstructorCourses = () => {
-  const { data, isLoading, error } = useAllCourseByInstructorQuery()
-  // const [deleteCourse] = useDeleteCourseMutation()
-  const navigate = useNavigate()
+  const { data, isLoading, error } = useAllCourseByInstructorQuery();
+   const [deleteCourse] = useDeleteCourseMutation() 
+  const navigate = useNavigate();
 
-  // const handleDelete = async (id) => {
-  //   const confirm = window.confirm("Are you sure you want to delete this course?")
-  //   if (!confirm) return
+   const courseDelete = async(id)=>{
+    try {
+      await deleteCourse(id)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  //   try {
-  //     const res = await deleteCourse(id).unwrap()
-  //     toast.success(res?.message || "Course deleted successfully")
-  //   } catch (err) {
-  //     toast.error("Failed to delete course")
-  //   }
-  // }
-
-  if (isLoading) return <p>Loading...</p>
-  if (error) return <p>Something went wrong!</p>
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Something went wrong!</p>;
 
   return (
     <div className="p-6">
@@ -44,24 +40,28 @@ const InstructorCourses = () => {
               <tr key={course._id} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b">{course.title}</td>
                 <td className="py-2 px-4 border-b">{course.category}</td>
-                <td className="py-2 px-4 border-b capitalize">{course.level}</td>
+                <td className="py-2 px-4 border-b capitalize">
+                  {course.level}
+                </td>
                 <td className="py-2 px-4 border-b">${course.price}</td>
                 <td className="py-2 px-4 border-b text-green-600 font-medium">
-                  {course.status || 'Draft'}
+                  {course.status || "Draft"}
                 </td>
                 <td className="py-2 px-4 border-b">
                   {new Date(course.createdAt).toLocaleDateString()}
                 </td>
                 <td className="flex py-2 px-4 ">
-                  <button
-                    // onClick={() => navigate(`/dashboard/edit-course/${course._id}`)}
+                  <Link
+
+                    to={`/dashbord/instructor/edit/course/${course._id}`}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2"
                   >
                     Edit
-                  </button>
+                  </Link>
+                  
                   <button
-                    // onClick={() => handleDelete(course._id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                     className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                     onClick={()=>courseDelete(course._id)}
                   >
                     Delete
                   </button>
@@ -71,8 +71,9 @@ const InstructorCourses = () => {
           </tbody>
         </table>
       </div>
-    </div>
-  )
-}
 
-export default InstructorCourses
+    </div>
+  );
+};
+
+export default InstructorCourses;

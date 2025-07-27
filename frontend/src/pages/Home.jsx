@@ -2,8 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router'; // fixed typo: react-router → react-router-dom
 import LatestCourses from '../components/Home/LatestCourses';
-
+ 
 const Home = () => {
+
   return (
     <>
       <motion.div

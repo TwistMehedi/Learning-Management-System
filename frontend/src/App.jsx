@@ -26,6 +26,7 @@ import InstructorCharts from "./components/InstructorDashboard/InstructorCharts"
 import AdminProfile from "./components/AdminDashboard/AdminProfile";
 import AllCourses from "./components/AdminDashboard/AllCourses";
 import AdminCharts from "./components/AdminDashboard/AdminCharts";
+import EditeCourse from "./components/InstructorDashboard/EditeCourse";
 
 function App() {
   const { user } = useSelector((state) => state.user);
@@ -98,7 +99,8 @@ function App() {
             <Route index element={<ProfileInstructor />} />
             <Route path="profile" element={<ProfileInstructor />}></Route>
             <Route path="create/course" element={<CreateCourses />}></Route>
-            <Route path="courses" element={<InstructorCourses />}></Route>
+            <Route path="courses/" element={<InstructorCourses />}></Route>
+            <Route path="edit/course/:id" element={<EditeCourse />}></Route>
             <Route path="charts" element={<InstructorCharts />}></Route>
         </Route>
         <Route path="/dashbord/admin" element={<AdminDashboard/>}>
